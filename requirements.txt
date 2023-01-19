@@ -1,0 +1,17 @@
+httpx
+requests
+
+black
+isort
+flake8
+mypy
+
+pytest
+pytest-cov
+pytest-recording
+hypothesis
+faker
+
+fastapi~=0.88.0
+uvicorn[standard]
+pydantic~=1.10.4
