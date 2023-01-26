@@ -1,6 +1,7 @@
 import secrets
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 from starlette.requests import Request
 
 from app.core import BitcoinWalletCore
@@ -14,10 +15,9 @@ def get_core(request: Request) -> BitcoinWalletCore:
     return core
 
 
-@user_api.post("/users")
+@user_api.post("/users", status_code=201)
 def register_user(
         first_name: str, last_name: str, core: BitcoinWalletCore = Depends(get_core)
-) -> str:
+) -> UserDTO:
     api_key = secrets.token_urlsafe(25)
-    core.create_user(user=UserDTO(first_name=first_name, last_name=last_name, api_key=api_key))
-    return "200 OK"
+    return core.create_user(user=UserDTO(first_name=first_name, last_name=last_name, api_key=api_key))

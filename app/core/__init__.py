@@ -12,5 +12,5 @@ class BitcoinWalletCore:
     def create(cls, user_repository: IUserRepository) -> "BitcoinWalletCore":
         return cls(_userInterface=UserService(user_repository))
 
-    def create_user(self, user: UserDTO) -> None:
-        self._userInterface.create_user(user)
+    def create_user(self, user: UserDTO) -> UserDTO:
+        return self._userInterface.create_user(user)

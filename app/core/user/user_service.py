@@ -6,7 +6,7 @@ from app.infra.sqlite.user_repo import IUserRepository
 
 
 class IUser(Protocol):
-    def create_user(self, user: UserDTO) -> None:
+    def create_user(self, user: UserDTO) -> UserDTO:
         pass
 
 
@@ -14,5 +14,5 @@ class IUser(Protocol):
 class UserService(IUser):
     _user_repo: IUserRepository
 
-    def create_user(self, user: UserDTO) -> None:
-        self._user_repo.create_user(user)
+    def create_user(self, user: UserDTO) -> UserDTO:
+        return self._user_repo.create_user(user)

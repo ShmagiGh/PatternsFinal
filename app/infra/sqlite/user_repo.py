@@ -5,7 +5,7 @@ from app.core import UserDTO
 
 
 class IUserRepository(Protocol):
-    def create_user(self, user: UserDTO) -> None:
+    def create_user(self, user: UserDTO) -> UserDTO:
         pass
 
 
@@ -22,7 +22,7 @@ class UserRepository(IUserRepository):
                     api_key VARCHAR(25) NOT NULL);"""
             )
 
-    def create_user(self, user: UserDTO) -> None:
+    def create_user(self, user: UserDTO) -> UserDTO:
         with sqlite3.connect(self._database_name) as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -30,3 +30,4 @@ class UserRepository(IUserRepository):
                 (user.first_name, user.last_name, user.api_key),
             )
             conn.commit()
+            return user
