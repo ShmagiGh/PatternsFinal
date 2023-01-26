@@ -1,3 +1,4 @@
+import secrets
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -15,4 +16,6 @@ class UserService(IUser):
     _user_repo: IUserRepository
 
     def create_user(self, user: UserDTO) -> UserDTO:
-        return self._user_repo.create_user(user)
+        user.api_key = secrets.token_urlsafe(25)
+        self._user_repo.create_user(user)
+        return user
