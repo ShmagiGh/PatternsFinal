@@ -1,26 +1,32 @@
+from decimal import Decimal
 from typing import Protocol
-
-from database import DB
 
 from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
+from app.infra.sqlite.database import DB
 
 
 class IWalletRepository(Protocol):
+    def __init__(self, db: DB) -> None:
+        pass
+
     def create_wallet(self, wallet: WalletDTO) -> None:
         pass
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: float
+        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: float
+        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
     ) -> None:
         pass
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> float:
+    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
+        pass
+
+    def check_wallet_count(self, api_key: str) -> int:
         pass
 
 
@@ -40,8 +46,10 @@ class WalletRepository(IWalletRepository):
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                 wallet_address TEXT NOT NULL,
                 coin_id INTEGER NOT NULL,
-                balance DOUBLE NOT NULL);"""
+                balance TEXT NOT NULL);"""
         )
+
+        self.db.conn.commit()
 
         # self.db.cur.execute(
         #     """CREATE TABLE IF NOT EXISTS coins
@@ -49,47 +57,75 @@ class WalletRepository(IWalletRepository):
         #         coin TEXT NOT NULL);"""
         # )
 
-    def create_wallet(self, wallet: WalletDTO) -> None:
+    def create_wallet(
+        self,
+        wallet: WalletDTO,
+        coin: CoinDTO = CoinDTO("BTC", 1),
+        amount: Decimal = Decimal("1"),
+    ) -> None:
         self.db.cur.execute(
             """INSERT INTO wallets (api_key, address) VALUES(?,?)""",
             (wallet.api_key, wallet.address),
         )
-        # self.db.conn.commit()
+        self.db.cur.execute(
+            """INSERT INTO balances (wallet_address, coin_id, balance) VALUES(?,?,?)""",
+            (wallet.address, coin.coin_id, str(amount)),
+        )
+        self.db.conn.commit()
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: float
+        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
     ) -> None:
+        curr_balance = self.check_wallet_balance(wallet, coin)
+        new_balance = curr_balance + amount
         self.db.cur.execute(
             """UPDATE balances
-                  SET amount = amount + ?
+                  SET balance = ?
                 WHERE wallet_address = ?
                   AND coin_id = ?
-              VALUES(?,?,?)""",
-            (amount, wallet.address, coin.coin_id),
+            """,
+            (str(new_balance), wallet.address, coin.coin_id),
         )
+        self.db.conn.commit()
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: float
+        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
     ) -> None:
+        curr_balance = self.check_wallet_balance(wallet, coin)
+        new_balance = curr_balance - amount
+        # print(curr_balance, amount, curr_balance - amount, curr_balance + amount)
+        # diff = curr_balance - amount
+        # print(diff)
         self.db.cur.execute(
             """UPDATE balances
-                  SET amount = amount - ?
+                  SET balance = ?
                 WHERE wallet_address = ?
                   AND coin_id = ?
-              VALUES(?,?,?)""",
-            (amount, wallet.address, coin.coin_id),
+            """,
+            (str(new_balance), wallet.address, coin.coin_id),
         )
+        self.db.conn.commit()
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> float:
+    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
         balance = self.db.cur.execute(
-            """SELECT balance 
-                 FROM balances
-                WHERE wallet_address = ?
-                  AND coin_id = ?
-               VALUES(?,?)""",
+            """SELECT b.balance 
+                 FROM balances b
+                WHERE b.wallet_address = ?
+                  AND b.coin_id = ?
+               """,
             (wallet.address, coin.coin_id),
         ).fetchone()[0]
-        return balance
+        return Decimal(str(balance))
+
+    def check_wallet_count(self, api_key: str) -> int:
+        count = self.db.cur.execute(
+            """SELECT COUNT(*)
+                 FROM wallets
+                WHERE api_key = ?
+            """,
+            (api_key,),
+        ).fetchone()[0]
+        return count
 
     # def add_coin_type(self, new_coin: str):
     #     self.db.cur.execute(
