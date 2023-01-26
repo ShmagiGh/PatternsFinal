@@ -1,7 +1,6 @@
 import secrets
 
-from fastapi import APIRouter, Depends, HTTPException
-from starlette import status
+from fastapi import APIRouter, Depends
 from starlette.requests import Request
 
 from app.core import BitcoinWalletCore
