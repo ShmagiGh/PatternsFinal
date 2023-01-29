@@ -7,6 +7,12 @@ from app.core.model.wallet_dto import WalletDTO
 from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService
 
 db = TestDB()
+db.cur.execute("""
+                DROP table wallets;
+                """)
+db.cur.execute("""
+                DROP table balances;
+                """)
 wallet_service = WalletService(db, RandomAddressGenerator())
 
 coin_btc = CoinDTO("BTC", 1)
@@ -56,3 +62,13 @@ def test_wallet_count():
     assert wallet_service.check_wallet_count(user1_api_key) == 1
     assert wallet_service.check_wallet_count(user2_api_key) == 3
     assert wallet_service.check_wallet_count(user3_api_key) == 0
+
+
+def test_get_wallet():
+    assert wallet_service.get_wallets("a1") == [wallets["wallet1"]]
+    assert wallet_service.get_wallets("a2") == [wallets["wallet2"],
+                                                wallets["wallet3"],
+                                                wallets["wallet4"]]
+    assert wallet_service.get_wallets("a3") == []
+
+
