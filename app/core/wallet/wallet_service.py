@@ -50,6 +50,9 @@ class IWallet(Protocol):
     def check_wallet_count(self, api_key: str) -> int:
         pass
 
+    def get_wallets(self, api_key: str) -> list[WalletDTO]:
+        pass
+
 
 @dataclass
 class WalletService(IWallet):
@@ -83,3 +86,6 @@ class WalletService(IWallet):
 
     def check_wallet_count(self, api_key: str) -> int:
         return self._wallet_repo.check_wallet_count(api_key)
+
+    def get_wallets(self, api_key: str) -> list[WalletDTO]:
+        return self._wallet_repo.get_wallets(api_key)

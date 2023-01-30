@@ -29,6 +29,9 @@ class IWalletRepository(Protocol):
     def check_wallet_count(self, api_key: str) -> int:
         pass
 
+    def get_wallets(self, api_key: str) -> list[WalletDTO]:
+        pass
+
 
 class WalletRepository(IWalletRepository):
     def __init__(self, db: DB) -> None:
@@ -126,6 +129,19 @@ class WalletRepository(IWalletRepository):
             (api_key,),
         ).fetchone()[0]
         return count
+
+    def get_wallets(self, api_key: str) -> list[WalletDTO]:
+        wallets = self.db.cur.execute(
+            """SELECT api_key, address
+                 FROM wallets
+                WHERE api_key = ?
+            """,
+            (api_key, )
+        ).fetchall()
+        return_wallets = []
+        for wallet in wallets:
+            return_wallets.append(WalletDTO(wallet[0], wallet[1]))
+        return return_wallets
 
     # def add_coin_type(self, new_coin: str):
     #     self.db.cur.execute(
