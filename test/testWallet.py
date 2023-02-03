@@ -7,12 +7,16 @@ from app.core.model.wallet_dto import WalletDTO
 from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService
 
 db = TestDB()
-db.cur.execute("""
+db.cur.execute(
+    """
                 DROP table wallets;
-                """)
-db.cur.execute("""
+                """
+)
+db.cur.execute(
+    """
                 DROP table balances;
-                """)
+                """
+)
 wallet_service = WalletService(db, RandomAddressGenerator())
 
 coin_btc = CoinDTO("BTC", 1)
@@ -41,12 +45,16 @@ def test_create_wallet():
 def test_deposit_wallet():
     wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc, Decimal("1.4"))
     wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc, Decimal("2.2"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal("4.6")
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal(
+        "4.6"
+    )
 
 
 def test_withdraw_wallet():
     wallet_service.withdraw_from_wallet(wallets["wallet1"], coin_btc, Decimal("0.7"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal("3.9")
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal(
+        "3.9"
+    )
 
 
 def test_wallet_count():
@@ -66,9 +74,9 @@ def test_wallet_count():
 
 def test_get_wallet():
     assert wallet_service.get_wallets("a1") == [wallets["wallet1"]]
-    assert wallet_service.get_wallets("a2") == [wallets["wallet2"],
-                                                wallets["wallet3"],
-                                                wallets["wallet4"]]
+    assert wallet_service.get_wallets("a2") == [
+        wallets["wallet2"],
+        wallets["wallet3"],
+        wallets["wallet4"],
+    ]
     assert wallet_service.get_wallets("a3") == []
-
-

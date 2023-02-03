@@ -14,6 +14,6 @@ def get_core(request: Request) -> BitcoinWalletCore:
 
 @user_api.post("/users", status_code=201)
 def register_user(
-        first_name: str, last_name: str, core: BitcoinWalletCore = Depends(get_core)
+    first_name: str, last_name: str, core: BitcoinWalletCore = Depends(get_core)
 ) -> UserDTO:
     return core.create_user(user=UserDTO(first_name, last_name))

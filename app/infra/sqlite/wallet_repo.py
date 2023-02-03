@@ -111,9 +111,9 @@ class WalletRepository(IWalletRepository):
 
     def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
         balance = self.db.cur.execute(
-            """SELECT b.balance 
+            """SELECT b.balance
                  FROM balances b
-                WHERE b.wallet_address = ?
+                 WHERE b.wallet_address = ?
                   AND b.coin_id = ?
                """,
             (wallet.address, coin.coin_id),
@@ -136,7 +136,7 @@ class WalletRepository(IWalletRepository):
                  FROM wallets
                 WHERE api_key = ?
             """,
-            (api_key, )
+            (api_key,),
         ).fetchall()
         return_wallets = []
         for wallet in wallets:

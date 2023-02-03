@@ -12,22 +12,30 @@ def service() -> BitcoinWalletCore:
 
 
 def test_create_user(service: BitcoinWalletCore) -> None:
-    result = service.create_user(user=UserDTO(first_name="Dito", last_name="Adeishvili"))
+    result = service.create_user(
+        user=UserDTO(first_name="Dito", last_name="Adeishvili")
+    )
     assert result.first_name == "Dito"
     assert result.last_name == "Adeishvili"
     assert result.api_key is not None
 
 
 def test_create_multiple_user(service: BitcoinWalletCore) -> None:
-    result = service.create_user(user=UserDTO(first_name="Dito", last_name="Adeishvili"))
+    result = service.create_user(
+        user=UserDTO(first_name="Dito", last_name="Adeishvili")
+    )
     assert result.first_name == "Dito"
     assert result.last_name == "Adeishvili"
     assert result.api_key is not None
-    result = service.create_user(user=UserDTO(first_name="Shmagi", last_name="Ghughunishvili"))
+    result = service.create_user(
+        user=UserDTO(first_name="Shmagi", last_name="Ghughunishvili")
+    )
     assert result.first_name == "Shmagi"
     assert result.last_name == "Ghughunishvili"
     assert result.api_key is not None
-    result = service.create_user(user=UserDTO(first_name="Bachi", last_name="Skhulukhia"))
+    result = service.create_user(
+        user=UserDTO(first_name="Bachi", last_name="Skhulukhia")
+    )
     assert result.first_name == "Bachi"
     assert result.last_name == "Skhulukhia"
     assert result.api_key is not None
