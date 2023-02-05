@@ -9,12 +9,12 @@ from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService
 db = TestDB()
 db.cur.execute(
     """
-                DROP table wallets;
+                DROP table if exists wallets;
                 """
 )
 db.cur.execute(
     """
-                DROP table balances;
+                DROP table if exists balances;
                 """
 )
 wallet_service = WalletService(db, RandomAddressGenerator())
