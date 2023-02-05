@@ -1,11 +1,14 @@
 import sqlite3
-from typing import Protocol
+from typing import Protocol, Any
 
 from app.core import UserDTO
 
 
 class IUserRepository(Protocol):
     def create_user(self, user: UserDTO) -> None:
+        pass
+
+    def find_user_by_api_key(self, api_key: str) -> UserDTO:
         pass
 
 
@@ -30,3 +33,17 @@ class UserRepository(IUserRepository):
                 (user.first_name, user.last_name, user.api_key),
             )
             conn.commit()
+
+    def find_user_by_api_key(self, api_key: str) -> UserDTO | None:
+        with sqlite3.connect(self._database_name) as conn:
+            cursor = conn.cursor()
+            try:
+                user = cursor.execute(
+                    """SELECT u.api_key 
+                        FROM users u
+                        WHERE u.api_key = ?""",
+                    api_key).fetchone()[0]
+                conn.commit()
+                return user
+            except:
+                return None
