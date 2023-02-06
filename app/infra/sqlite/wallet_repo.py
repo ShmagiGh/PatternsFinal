@@ -7,10 +7,8 @@ from app.infra.sqlite.database import DB
 
 
 class IWalletRepository(Protocol):
-    def __init__(self, db: DB) -> None:
-        pass
 
-    def create_wallet(self, wallet: WalletDTO) -> None:
+    def create_wallet(self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal) -> None:
         pass
 
     def deposit_to_wallet(

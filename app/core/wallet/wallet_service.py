@@ -6,7 +6,6 @@ from typing import Protocol
 
 from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
-from app.infra.sqlite.database import DB
 from app.infra.sqlite.wallet_repo import WalletRepository
 
 
@@ -28,8 +27,6 @@ class RandomAddressGenerator(IWalletAddressGenerator):
 
 
 class IWallet(Protocol):
-    def __init__(self, wallet_repo: WalletRepository) -> None:
-        pass
 
     def create_wallet(self, wallet: WalletDTO) -> str:
         pass

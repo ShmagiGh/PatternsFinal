@@ -38,9 +38,9 @@ class TransactionRepository(ITransactionRepository):
                 coin_type_id INTEGER NOT NULL,
                 wallet_from_address TEXT NOT NULL,
                 wallet_to_address TEXT NOT NULL,
-                time_created DATETIME DEFAULT CURRENT_TIMESTAMP),
+                time_created DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(wallet_from_address) REFERENCES wallets(address),
-                FOREIGN KEY(wallet_to_address) REFERENCES wallets(address);"""
+                FOREIGN KEY(wallet_to_address) REFERENCES wallets(address));"""
             # TODO: ეს უნდა მივაბა როცა ქოინების თეიბლი გვექნება
             # FOREIGN KEY(coin_type_id) REFERENCES wallets(address)
         )
