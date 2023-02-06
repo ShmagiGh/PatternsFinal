@@ -27,7 +27,7 @@ def post_wallet(api_key: str):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User can't have more than 3 wallets."
         )
-    address = wallet_service.create_wallet(api_key=api_key, coin=CoinDTO("BTC", 1), amount=Decimal("1"))
+    address = wallet_service.create_wallet(api_key=api_key)
     return address, CoinDTO("BTC", 1)
 
 

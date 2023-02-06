@@ -28,7 +28,7 @@ class RandomAddressGenerator(IWalletAddressGenerator):
 
 
 class IWallet(Protocol):
-    def __init__(self, db: DB) -> None:
+    def __init__(self, wallet_repo: WalletRepository) -> None:
         pass
 
     def create_wallet(self, wallet: WalletDTO) -> str:
@@ -56,8 +56,8 @@ class IWallet(Protocol):
 
 @dataclass
 class WalletService(IWallet):
-    def __init__(self, db: DB, address_generator: IWalletAddressGenerator) -> None:
-        self._wallet_repo = WalletRepository(db)
+    def __init__(self, wallet_repo: WalletRepository, address_generator: IWalletAddressGenerator) -> None:
+        self._wallet_repo = wallet_repo
         self.address_generator = address_generator
 
     def create_wallet(

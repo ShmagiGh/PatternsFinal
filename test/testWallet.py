@@ -5,6 +5,7 @@ from app.core.model.coin import CoinDTO
 from app.core.model.user_dto import UserDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService
+from app.infra.sqlite.wallet_repo import WalletRepository
 
 db = TestDB()
 db.cur.execute(
@@ -17,7 +18,8 @@ db.cur.execute(
                 DROP table if exists balances;
                 """
 )
-wallet_service = WalletService(db, RandomAddressGenerator())
+wallet_repo = WalletRepository(db)
+wallet_service = WalletService(wallet_repo, RandomAddressGenerator())
 
 coin_btc = CoinDTO("BTC", 1)
 coin_satoshi = CoinDTO("SATOSHI", 2)
