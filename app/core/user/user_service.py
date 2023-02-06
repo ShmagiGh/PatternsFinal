@@ -10,6 +10,9 @@ class IUser(Protocol):
     def create_user(self, user: UserDTO) -> UserDTO:
         pass
 
+    def find_user_by_api_key(self, api_key) -> UserDTO:
+        pass
+
 
 @dataclass
 class UserService(IUser):
@@ -19,3 +22,6 @@ class UserService(IUser):
         user.api_key = secrets.token_urlsafe(25)
         self._user_repo.create_user(user)
         return user
+
+    def find_user_by_api_key(self, api_key) -> UserDTO:
+        return self._user_repo.find_user_by_api_key(api_key)

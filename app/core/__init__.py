@@ -14,3 +14,6 @@ class BitcoinWalletCore:
 
     def create_user(self, user: UserDTO) -> UserDTO:
         return self._userInterface.create_user(user)
+
+    def find_user_by_api_key(self, api_key: str) -> UserDTO:
+        return self._userInterface.find_user_by_api_key(api_key)
