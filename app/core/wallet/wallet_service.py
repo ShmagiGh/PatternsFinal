@@ -6,7 +6,7 @@ from typing import Protocol
 
 from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
-from app.infra.sqlite.wallet_repo import WalletRepository
+from app.infra.sqlite.wallet_repo import IWalletRepository
 
 
 class IWalletAddressGenerator(Protocol):
@@ -53,7 +53,7 @@ class IWallet(Protocol):
 
 @dataclass
 class WalletService(IWallet):
-    def __init__(self, wallet_repo: WalletRepository, address_generator: IWalletAddressGenerator) -> None:
+    def __init__(self, wallet_repo: IWalletRepository, address_generator: IWalletAddressGenerator) -> None:
         self._wallet_repo = wallet_repo
         self.address_generator = address_generator
 
