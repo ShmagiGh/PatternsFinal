@@ -3,15 +3,24 @@ from app.infra.sqlite.database import DB
 from app.core.wallet.wallet_service import WalletService, RandomAddressGenerator
 from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
+from app.core.user.user_service import UserService
+from app.infra.sqlite.user_repo import UserRepository
 from decimal import Decimal
 
 db = DB()
 wallet_service = WalletService(db, RandomAddressGenerator())
-wallet_api = FastAPI()
+user_service = UserService(UserRepository())
+wallet_api = APIRouter()
 
 
 @wallet_api.post("/wallets")
 def post_wallet(api_key: str):
+    if user_service.find_user_by_api_key(api_key) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No such wallet exists."
+        )
+
     wallet_count = wallet_service.check_wallet_count(api_key)
     if wallet_count >= 3:
         raise HTTPException(
