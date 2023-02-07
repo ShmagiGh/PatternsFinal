@@ -5,8 +5,7 @@ from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.infra.fastapi import get_core
 
-
-wallet_api = APIRouter()
+wallet_api = APIRouter(tags=["Wallets"])
 
 
 @wallet_api.post("/wallets")
