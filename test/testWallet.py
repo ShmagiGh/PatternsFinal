@@ -1,11 +1,19 @@
 from decimal import Decimal
-from test.testDB import TestDB
+import sqlite3
 
 from app.core.model.coin import CoinDTO
 from app.core.model.user_dto import UserDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService
 from app.infra.sqlite.wallet_repo import WalletRepository
+
+
+class TestDB:
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect("TestDb.sqlite", check_same_thread=False)
+        print("Connected")
+        self.cur = self.conn.cursor()
+
 
 db = TestDB()
 db.cur.execute(

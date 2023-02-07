@@ -28,7 +28,7 @@ class RandomAddressGenerator(IWalletAddressGenerator):
 
 class IWallet(Protocol):
 
-    def create_wallet(self, wallet: WalletDTO) -> str:
+    def create_wallet(self, api_key: str, coin: CoinDTO, amount: Decimal) -> str:
         pass
 
     def deposit_to_wallet(
