@@ -20,6 +20,15 @@ test_transaction_2 = TransactionDTO(
 )
 
 
+def test_create_transaction() -> None:
+    transaction_repo_test = InMemoryTransactionRepository(
+        mock_transactions_sent={},
+        mock_transactions_received={},
+    )
+    transactions = TransactionService(transaction_repo=transaction_repo_test)
+
+    assert transactions.create_transaction("123", test_transaction_1) is not None
+
 def test_get_user_transactions() -> None:
     transaction_repo_test = InMemoryTransactionRepository(
         mock_transactions_sent={"123": [test_transaction_1]},

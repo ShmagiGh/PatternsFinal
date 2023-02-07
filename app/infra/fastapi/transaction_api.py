@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
-
+from decimal import Decimal
 from app.core import BitcoinWalletCore
 from app.core.model.transaction_dto import TransactionDTO
 from app.core.transaction.transaction_service import TransactionService
@@ -30,7 +30,7 @@ def set_transaction(api_key: str,
                     to_address: str,
                     amount: str,
                     core: BitcoinWalletCore = Depends(get_core)) -> TransactionDTO:
-    commission: float = 0.0
+    commission: Decimal = Decimal(0.0)
     user_wallets = core.walletInterface.get_wallets(api_key=api_key)
     user_wallets_addresses = map(lambda wallet: wallet.address, user_wallets)
 
@@ -40,12 +40,26 @@ def set_transaction(api_key: str,
             detail="User With this api key has no wallet with that address"
         )
 
-    if not (from_address in user_wallets_addresses and to_address in user_wallets_addresses):
-        commission = 1.5  # Constant ებში უნდა გავიტანოთ ან სადმე
-    transaction = TransactionDTO(amount=float(amount),
-                                 commission=commission,
+    #TODO: check if we have wallet with specified address (need to be added in wallet_repo)
+    # if to_address not in core.walletInterface.
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="Wrong wallet to deposit"
+    #     )
+
+    if from_address in user_wallets_addresses and to_address in user_wallets_addresses:
+        commission = 0.015  # Constant ებში უნდა გავიტანოთ ან სადმე
+    else:
+        commission = 0.0
+    transaction = TransactionDTO(amount=Decimal(amount),
+                                 commission=Decimal(commission),
                                  coin_type_id=coin_type_id,
                                  wallet_from_address=from_address,
                                  wallet_to_address=to_address)
-    core.transactionInterface.create_transaction(transaction)
+    created = core.transactionInterface.create_transaction(api_key,transaction)
+    if created is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Creation Failed"
+        )
     return transaction

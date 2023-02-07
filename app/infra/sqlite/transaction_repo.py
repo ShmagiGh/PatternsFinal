@@ -1,7 +1,10 @@
 import enum
 from typing import List, Protocol
+from decimal import Decimal
 
+from app.core.model.coin import CoinDTO
 from app.core.model.transaction_dto import TransactionDTO
+from app.core.model.wallet_dto import WalletDTO
 from app.infra.sqlite.database import DB
 from app.infra.sqlite.wallet_repo import WalletRepository
 
@@ -12,7 +15,7 @@ class AddressType(enum.Enum):
 
 
 class ITransactionRepository(Protocol):
-    def create_transaction(self, transaction: TransactionDTO) -> bool:
+    def create_transaction(self, api_key: str, transaction: TransactionDTO) -> TransactionDTO | None:
         pass
 
     def get_transactions_of_user(self, api_key: str) -> List[TransactionDTO]:
@@ -25,7 +28,6 @@ class ITransactionRepository(Protocol):
         pass
 
 
-# TODO: Need to recheck and finish
 class TransactionRepository(ITransactionRepository):
     def __init__(self, db: DB, wallet_repo: WalletRepository) -> None:
         self.db = db
@@ -46,7 +48,17 @@ class TransactionRepository(ITransactionRepository):
         )
         self.db.conn.commit()
 
-    def create_transaction(self, transaction: TransactionDTO) -> None:
+    def create_transaction(self, api_key: str, transaction: TransactionDTO) -> TransactionDTO | None:
+        wallet_from = WalletDTO(api_key=api_key, address=transaction.wallet_from_address)  # TODO: unda davasrulo
+        wallet_to = WalletDTO(api_key=api_key, address=transaction.wallet_to_address)  # TODO: unda davasrulo
+
+        coin_id = transaction.coin_type_id
+        self.wallet_repo.check_wallet_balance(wallet=wallet_to, coin_id=coin_id)
+        withdrawn_amount = (1 + transaction.commission) * transaction.amount
+        # ვოლეტი ამის api_key-ს თუ ემთხვევა უნდა გავტესტოთ
+        if self.wallet_repo.check_wallet_balance(wallet=wallet_from, coin_id=coin_id) < withdrawn_amount:
+            return None
+
         self.db.cur.execute(
             """INSERT INTO transactions (amount,
                                          commision,
@@ -55,14 +67,18 @@ class TransactionRepository(ITransactionRepository):
                                          wallet_to_address)
                             VALUES(?,?,?,?,?)""",
             (
-                transaction.amount,
-                transaction.commission,
+                float(transaction.amount),
+                float(transaction.commission),
                 transaction.coin_type_id,
                 transaction.wallet_from_address,
                 transaction.wallet_to_address,
             ),
         )
+        self.wallet_repo.deposit_to_wallet(wallet=wallet_to, coin_id=coin_id, amount=transaction.amount)
+        self.wallet_repo.withdraw_from_wallet(wallet=wallet_from, coin_id=coin_id, amount=withdrawn_amount)
+
         self.db.conn.commit()
+        return transaction
 
     def get_transactions_of_user(self, api_key: str) -> List[TransactionDTO]:
         wallets = self.wallet_repo.get_wallets(api_key=api_key)
@@ -70,6 +86,8 @@ class TransactionRepository(ITransactionRepository):
             map(
                 lambda wallet: self._get_transactions(
                     address=wallet.address, address_type=AddressType.to_wallet
+                ) + self._get_transactions(
+                    address=wallet.address, address_type=AddressType.from_wallet
                 ),
                 wallets,
             )
@@ -84,28 +102,35 @@ class TransactionRepository(ITransactionRepository):
         self._get_transaction(address=address, address_type=AddressType.from_wallet)
 
     def _get_transactions(
-        self, address: str, address_type: AddressType
+            self, address: str, address_type: AddressType
     ) -> List[TransactionDTO]:
+        address_type_without_quotes = address_type.value[1:-1]
+
+        transaction_str = """SELECT amount,
+                      commision,
+                      coin_type_id,
+                      wallet_from_address,
+                      wallet_to_address
+                 FROM transactions """
+
+        if address_type == AddressType.from_wallet:
+            transaction_str += "WHERE wallet_from_address = ?;"
+        else:
+            transaction_str += "WHERE wallet_to_address = ?;"
+
         transactions = self.db.cur.execute(
-            """SELECT (amount,
-                       commision,
-                       coin_type_id,
-                       wallet_from_address,
-                       wallet_to_address)
-                 FROM transactions
-                 WHERE ? = ?
-            """,
-            (address_type.value, address),
+            transaction_str,
+            (address,),
         ).fetchall()
 
-        transactions = map(
+        new_transactions = list(map(
             lambda elem: TransactionDTO(
-                amount=elem[0],
-                commission=elem[1],
+                amount=Decimal(elem[0]),
+                commission=Decimal(elem[1]),
                 coin_type_id=elem[2],
                 wallet_from_address=elem[3],
                 wallet_to_address=elem[4],
             ),
             transactions,
-        )
-        return transactions
+        ))
+        return new_transactions

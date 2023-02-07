@@ -11,7 +11,7 @@ class InMemoryTransactionRepository(ITransactionRepository):
     mock_transactions_sent: DefaultDict[str, List[TransactionDTO]]
     mock_transactions_received: DefaultDict[str, List[TransactionDTO]]
 
-    def create_transaction(self, transaction: TransactionDTO) -> None:
+    def create_transaction(self, api_key: str, transaction: TransactionDTO) -> TransactionDTO | None:
         if transaction.wallet_from_address in self.mock_transactions_sent:
             all_transactions = self.mock_transactions_sent[
                 transaction.wallet_from_address
@@ -35,6 +35,7 @@ class InMemoryTransactionRepository(ITransactionRepository):
             self.mock_transactions_received[transaction.wallet_to_address] = [
                 transaction
             ]
+        return transaction
 
     def get_transactions_of_user(self, api_key: str) -> List[TransactionDTO]:
         all_transactions = list()
