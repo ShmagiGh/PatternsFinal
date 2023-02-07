@@ -14,7 +14,7 @@ def post_wallet(api_key: str, core: BitcoinWalletCore = Depends(get_core)):
     if core.userInterface.find_user_by_api_key(api_key) is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No such wallet exists."
+            detail="No such user exists."
         )
 
     wallet_count = core.walletInterface.check_wallet_count(api_key)

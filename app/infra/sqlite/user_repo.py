@@ -8,7 +8,7 @@ class IUserRepository(Protocol):
     def create_user(self, user: UserDTO) -> None:
         pass
 
-    def find_user_by_api_key(self, api_key: str) -> UserDTO:
+    def find_user_by_api_key(self, api_key: str) -> UserDTO | None:
         pass
 
 
@@ -22,6 +22,7 @@ class UserRepository(IUserRepository):
                     last_name TEXT NOT NULL,
                     api_key VARCHAR(25) NOT NULL);"""
         )
+        self.db.conn.commit()
 
     def create_user(self, user: UserDTO) -> None:
         self.db.cur.execute(
@@ -33,11 +34,10 @@ class UserRepository(IUserRepository):
     def find_user_by_api_key(self, api_key: str) -> UserDTO | None:
         try:
             user = self.db.cur.execute(
-                """SELECT u.api_key 
-                        FROM users u
-                        WHERE u.api_key = ?""",
-                api_key).fetchone()[0]
-            self.db.conn.commit()
+                """SELECT api_key 
+                        FROM users
+                        WHERE api_key = ?""",
+                (api_key, )).fetchone()[0]
             return user
         except:
             return None
