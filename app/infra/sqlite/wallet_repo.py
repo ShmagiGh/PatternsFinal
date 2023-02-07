@@ -8,20 +8,20 @@ from app.infra.sqlite.database import DB
 
 class IWalletRepository(Protocol):
 
-    def create_wallet(self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal) -> None:
+    def create_wallet(self, wallet: WalletDTO, coin_id: int, amount: Decimal) -> None:
         pass
 
     def deposit_to_wallet(
-            self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+            self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-            self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+            self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
         pass
 
     def check_wallet_count(self, api_key: str) -> int:
@@ -61,7 +61,7 @@ class WalletRepository(IWalletRepository):
     def create_wallet(
             self,
             wallet: WalletDTO,
-            coin: CoinDTO = CoinDTO("BTC", 1),
+            coin_id: int = 1,
             amount: Decimal = Decimal("1"),
     ) -> None:
         self.db.cur.execute(
@@ -70,14 +70,14 @@ class WalletRepository(IWalletRepository):
         )
         self.db.cur.execute(
             """INSERT INTO balances (wallet_address, coin_id, balance) VALUES(?,?,?)""",
-            (wallet.address, coin.coin_id, str(amount)),
+            (wallet.address, coin_id, str(amount)),
         )
         self.db.conn.commit()
 
     def deposit_to_wallet(
-            self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+            self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
-        curr_balance = self.check_wallet_balance(wallet, coin)
+        curr_balance = self.check_wallet_balance(wallet, coin_id)
         new_balance = curr_balance + amount
         self.db.cur.execute(
             """UPDATE balances
@@ -85,14 +85,14 @@ class WalletRepository(IWalletRepository):
                 WHERE wallet_address = ?
                   AND coin_id = ?
             """,
-            (str(new_balance), wallet.address, coin.coin_id),
+            (str(new_balance), wallet.address, coin_id),
         )
         self.db.conn.commit()
 
     def withdraw_from_wallet(
-            self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+            self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
-        curr_balance = self.check_wallet_balance(wallet, coin)
+        curr_balance = self.check_wallet_balance(wallet, coin_id)
         new_balance = curr_balance - amount
         # print(curr_balance, amount, curr_balance - amount, curr_balance + amount)
         # diff = curr_balance - amount
@@ -103,11 +103,11 @@ class WalletRepository(IWalletRepository):
                 WHERE wallet_address = ?
                   AND coin_id = ?
             """,
-            (str(new_balance), wallet.address, coin.coin_id),
+            (str(new_balance), wallet.address, coin_id),
         )
         self.db.conn.commit()
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
         try:
             balance = self.db.cur.execute(
                 """SELECT b.balance
@@ -115,7 +115,7 @@ class WalletRepository(IWalletRepository):
                      WHERE b.wallet_address = ?
                       AND b.coin_id = ?
                    """,
-                (wallet.address, coin.coin_id),
+                (wallet.address, coin_id),
             ).fetchone()[0]
             return Decimal(str(balance))
         except:

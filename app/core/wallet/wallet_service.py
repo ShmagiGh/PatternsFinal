@@ -28,20 +28,20 @@ class RandomAddressGenerator(IWalletAddressGenerator):
 
 class IWallet(Protocol):
 
-    def create_wallet(self, api_key: str, coin: CoinDTO, amount: Decimal) -> str:
+    def create_wallet(self, api_key: str, coin_id: int, amount: Decimal) -> str:
         pass
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
         pass
 
     def check_wallet_count(self, api_key: str) -> int:
@@ -60,26 +60,26 @@ class WalletService(IWallet):
     def create_wallet(
         self,
         api_key: str,
-        coin: CoinDTO = CoinDTO("BTC", 1),
+        coin_id: int = 1,
         amount: Decimal = Decimal("1"),
     ) -> str:
         address = self.address_generator.generate_address()
         wallet = WalletDTO(api_key=api_key, address=address)
-        self._wallet_repo.create_wallet(wallet, coin, amount)
+        self._wallet_repo.create_wallet(wallet, coin_id, amount)
         return address
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
-        self._wallet_repo.deposit_to_wallet(wallet, coin, amount)
+        self._wallet_repo.deposit_to_wallet(wallet, coin_id, amount)
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin: CoinDTO, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
-        self._wallet_repo.withdraw_from_wallet(wallet, coin, amount)
+        self._wallet_repo.withdraw_from_wallet(wallet, coin_id, amount)
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin: CoinDTO) -> Decimal:
-        return self._wallet_repo.check_wallet_balance(wallet, coin)
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
+        return self._wallet_repo.check_wallet_balance(wallet, coin_id)
 
     def check_wallet_count(self, api_key: str) -> int:
         return self._wallet_repo.check_wallet_count(api_key)

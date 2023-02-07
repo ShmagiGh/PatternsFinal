@@ -53,16 +53,16 @@ def test_create_wallet():
 
 
 def test_deposit_wallet():
-    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc, Decimal("1.4"))
-    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc, Decimal("2.2"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal(
+    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("1.4"))
+    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("2.2"))
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.coin_id) == Decimal(
         "4.6"
     )
 
 
 def test_withdraw_wallet():
-    wallet_service.withdraw_from_wallet(wallets["wallet1"], coin_btc, Decimal("0.7"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc) == Decimal(
+    wallet_service.withdraw_from_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("0.7"))
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.coin_id) == Decimal(
         "3.9"
     )
 

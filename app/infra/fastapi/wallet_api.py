@@ -32,7 +32,8 @@ def get_wallet(
         address: str = Path(None, description="This is address of wallet"),
         core: BitcoinWalletCore = Depends(get_core)
 ):
-    balance_btc = core.walletInterface.check_wallet_balance(WalletDTO(api_key, address), CoinDTO("BTC", 1))
+    coin = CoinDTO("BTC", 1)
+    balance_btc = core.walletInterface.check_wallet_balance(WalletDTO(api_key, address), coin.coin_id)
     if balance_btc is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
