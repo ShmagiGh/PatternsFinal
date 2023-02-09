@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Path, HTTPException, status, Depends
 
 from app.core import BitcoinWalletCore
-from app.core.model.coin import CoinDTO
+from app.core.model.coin_dto import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.infra.fastapi import get_core
 

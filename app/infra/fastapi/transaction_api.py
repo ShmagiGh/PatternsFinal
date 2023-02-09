@@ -1,14 +1,11 @@
+from decimal import Decimal
 from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
-from decimal import Decimal
+
 from app.core import BitcoinWalletCore
 from app.core.model.transaction_dto import TransactionDTO
-from app.core.transaction.transaction_service import TransactionService
 from app.infra.fastapi import get_core
-from app.infra.sqlite.database import DB
-from app.infra.sqlite.transaction_repo import TransactionRepository
-from app.infra.sqlite.wallet_repo import WalletRepository
 
 transaction_api = APIRouter(prefix="/transactions", tags=["Transactions"])
 

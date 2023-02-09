@@ -4,10 +4,11 @@ from app.core import BitcoinWalletCore
 from app.infra.fastapi.transaction_api import transaction_api
 from app.infra.fastapi.user_api import user_api
 from app.infra.fastapi.wallet_api import wallet_api
+from app.infra.sqlite.coin_repo import CoinRepository
 from app.infra.sqlite.database import DB
+from app.infra.sqlite.transaction_repo import TransactionRepository
 from app.infra.sqlite.user_repo import UserRepository
 from app.infra.sqlite.wallet_repo import WalletRepository
-from app.infra.sqlite.transaction_repo import TransactionRepository
 
 
 def setup() -> FastAPI:
@@ -18,9 +19,11 @@ def setup() -> FastAPI:
     db = DB()
     user_repository = UserRepository(db)
     wallet_repository = WalletRepository(db)
+    coin_repository = CoinRepository(db)
     transaction_repository = TransactionRepository(db, wallet_repository)
     app.state.core = BitcoinWalletCore.create(user_repository=user_repository,
                                               wallet_repository=wallet_repository,
-                                              transaction_repository=transaction_repository)
+                                              transaction_repository=transaction_repository,
+                                              coin_repository=coin_repository)
 
     return app

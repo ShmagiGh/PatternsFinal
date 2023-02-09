@@ -1,7 +1,7 @@
-from decimal import Decimal
 import sqlite3
+from decimal import Decimal
 
-from app.core.model.coin import CoinDTO
+from app.core.model.coin_dto import CoinDTO
 from app.core.model.user_dto import UserDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.core.wallet.wallet_service import RandomAddressGenerator, WalletService

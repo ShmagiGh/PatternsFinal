@@ -1,7 +1,6 @@
 from decimal import Decimal
 from typing import Protocol
 
-from app.core.model.coin import CoinDTO
 from app.core.model.wallet_dto import WalletDTO
 from app.infra.sqlite.database import DB
 
