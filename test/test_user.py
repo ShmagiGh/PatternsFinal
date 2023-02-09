@@ -1,17 +1,17 @@
 import pytest
 
-from app.core import BitcoinWalletCore
+from app.core import UserService, IUser
 from app.core.model.user_dto import UserDTO
 from app.infra.in_memory.user_memory_repo import InMemoryUserRepository
 
 
 @pytest.fixture
-def service() -> BitcoinWalletCore:
+def service() -> IUser:
     user_repository = InMemoryUserRepository()
-    return BitcoinWalletCore.create(user_repository=user_repository)
+    return UserService(user_repository)
 
 
-def test_create_user(service: BitcoinWalletCore) -> None:
+def test_create_user(service: IUser) -> None:
     result = service.create_user(
         user=UserDTO(first_name="Dito", last_name="Adeishvili")
     )
@@ -20,7 +20,7 @@ def test_create_user(service: BitcoinWalletCore) -> None:
     assert result.api_key is not None
 
 
-def test_create_multiple_user(service: BitcoinWalletCore) -> None:
+def test_create_multiple_user(service: IUser) -> None:
     result = service.create_user(
         user=UserDTO(first_name="Dito", last_name="Adeishvili")
     )
@@ -41,7 +41,7 @@ def test_create_multiple_user(service: BitcoinWalletCore) -> None:
     assert result.api_key is not None
 
 
-def test_find_user_by_api_key(service: BitcoinWalletCore) -> None:
+def test_find_user_by_api_key(service: IUser) -> None:
     user = service.create_user(
         user=UserDTO(first_name="Dito", last_name="Adeishvili")
     )
@@ -52,7 +52,7 @@ def test_find_user_by_api_key(service: BitcoinWalletCore) -> None:
     assert result.api_key is not None
 
 
-def test_find_multiple_user_by_api_key(service: BitcoinWalletCore) -> None:
+def test_find_multiple_user_by_api_key(service: IUser) -> None:
     user = service.create_user(
         user=UserDTO(first_name="Dito", last_name="Adeishvili")
     )
