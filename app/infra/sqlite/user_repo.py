@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from app.core import UserDTO
+from app.core.model.user_dto import UserDTO
 from app.infra.sqlite.database import DB
 
 
@@ -34,10 +34,11 @@ class UserRepository(IUserRepository):
     def find_user_by_api_key(self, api_key: str) -> UserDTO | None:
         try:
             user = self.db.cur.execute(
-                """SELECT api_key 
+                """SELECT api_key
                         FROM users
                         WHERE api_key = ?""",
-                (api_key, )).fetchone()[0]
+                (api_key,),
+            ).fetchone()[0]
             return user
         except:
             return None

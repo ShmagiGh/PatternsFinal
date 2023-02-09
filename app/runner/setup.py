@@ -25,10 +25,12 @@ def setup() -> FastAPI:
     coin_repository = CoinRepository(db)
     transaction_repository = TransactionRepository(db, wallet_repository)
     statistic_repository = StatisticRepository(db)
-    app.state.core = BitcoinWalletCore.create(user_repository=user_repository,
-                                              wallet_repository=wallet_repository,
-                                              transaction_repository=transaction_repository,
-                                              coin_repository=coin_repository,
-                                              statistic_repository=statistic_repository)
+    app.state.core = BitcoinWalletCore.create(
+        user_repository=user_repository,
+        wallet_repository=wallet_repository,
+        transaction_repository=transaction_repository,
+        coin_repository=coin_repository,
+        statistic_repository=statistic_repository,
+    )
 
     return app

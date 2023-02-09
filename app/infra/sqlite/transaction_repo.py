@@ -14,7 +14,9 @@ class AddressType(enum.Enum):
 
 
 class ITransactionRepository(Protocol):
-    def create_transaction(self, api_key: str, transaction: TransactionDTO) -> TransactionDTO | None:
+    def create_transaction(
+        self, api_key: str, transaction: TransactionDTO
+    ) -> TransactionDTO | None:
         pass
 
     def get_transactions_of_user(self, api_key: str) -> List[TransactionDTO]:
@@ -42,20 +44,25 @@ class TransactionRepository(ITransactionRepository):
                 time_created DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(wallet_from_address) REFERENCES wallets(address),
                 FOREIGN KEY(wallet_to_address) REFERENCES wallets(address));"""
-            # TODO: ეს უნდა მივაბა როცა ქოინების თეიბლი გვექნება
-            # FOREIGN KEY(coin_type_id) REFERENCES wallets(address)
         )
         self.db.conn.commit()
 
-    def create_transaction(self, api_key: str, transaction: TransactionDTO) -> TransactionDTO | None:
-        wallet_from = WalletDTO(api_key=api_key, address=transaction.wallet_from_address)  # TODO: unda davasrulo
-        wallet_to = WalletDTO(api_key=api_key, address=transaction.wallet_to_address)  # TODO: unda davasrulo
+    def create_transaction(
+        self, api_key: str, transaction: TransactionDTO
+    ) -> TransactionDTO | None:
+        wallet_from = WalletDTO(
+            api_key=api_key, address=transaction.wallet_from_address
+        )
+        wallet_to = WalletDTO(api_key=api_key, address=transaction.wallet_to_address)
 
         coin_id = transaction.coin_type_id
         self.wallet_repo.check_wallet_balance(wallet=wallet_to, coin_id=coin_id)
         withdrawn_amount = (1 + transaction.commission) * transaction.amount
         # ვოლეტი ამის api_key-ს თუ ემთხვევა უნდა გავტესტოთ
-        if self.wallet_repo.check_wallet_balance(wallet=wallet_from, coin_id=coin_id) < withdrawn_amount:
+        if (
+            self.wallet_repo.check_wallet_balance(wallet=wallet_from, coin_id=coin_id)
+            < withdrawn_amount
+        ):
             return None
 
         self.db.cur.execute(
@@ -73,8 +80,12 @@ class TransactionRepository(ITransactionRepository):
                 transaction.wallet_to_address,
             ),
         )
-        self.wallet_repo.deposit_to_wallet(wallet=wallet_to, coin_id=coin_id, amount=transaction.amount)
-        self.wallet_repo.withdraw_from_wallet(wallet=wallet_from, coin_id=coin_id, amount=withdrawn_amount)
+        self.wallet_repo.deposit_to_wallet(
+            wallet=wallet_to, coin_id=coin_id, amount=transaction.amount
+        )
+        self.wallet_repo.withdraw_from_wallet(
+            wallet=wallet_from, coin_id=coin_id, amount=withdrawn_amount
+        )
 
         self.db.conn.commit()
         return transaction
@@ -85,7 +96,8 @@ class TransactionRepository(ITransactionRepository):
             map(
                 lambda wallet: self._get_transactions(
                     address=wallet.address, address_type=AddressType.to_wallet
-                ) + self._get_transactions(
+                )
+                + self._get_transactions(
                     address=wallet.address, address_type=AddressType.from_wallet
                 ),
                 wallets,
@@ -101,10 +113,8 @@ class TransactionRepository(ITransactionRepository):
         self._get_transaction(address=address, address_type=AddressType.from_wallet)
 
     def _get_transactions(
-            self, address: str, address_type: AddressType
+        self, address: str, address_type: AddressType
     ) -> List[TransactionDTO]:
-        address_type_without_quotes = address_type.value[1:-1]
-
         transaction_str = """SELECT amount,
                       commision,
                       coin_type_id,
@@ -122,14 +132,16 @@ class TransactionRepository(ITransactionRepository):
             (address,),
         ).fetchall()
 
-        new_transactions = list(map(
-            lambda elem: TransactionDTO(
-                amount=Decimal(elem[0]),
-                commission=Decimal(elem[1]),
-                coin_type_id=elem[2],
-                wallet_from_address=elem[3],
-                wallet_to_address=elem[4],
-            ),
-            transactions,
-        ))
+        new_transactions = list(
+            map(
+                lambda elem: TransactionDTO(
+                    amount=Decimal(elem[0]),
+                    commission=Decimal(elem[1]),
+                    coin_type_id=elem[2],
+                    wallet_from_address=elem[3],
+                    wallet_to_address=elem[4],
+                ),
+                transactions,
+            )
+        )
         return new_transactions

@@ -26,7 +26,6 @@ class RandomAddressGenerator(IWalletAddressGenerator):
 
 
 class IWallet(Protocol):
-
     def create_wallet(self, api_key: str, coin_id: int, amount: Decimal) -> str:
         pass
 
@@ -52,7 +51,9 @@ class IWallet(Protocol):
 
 @dataclass
 class WalletService(IWallet):
-    def __init__(self, wallet_repo: IWalletRepository, address_generator: IWalletAddressGenerator) -> None:
+    def __init__(
+        self, wallet_repo: IWalletRepository, address_generator: IWalletAddressGenerator
+    ) -> None:
         self._wallet_repo = wallet_repo
         self.address_generator = address_generator
 

@@ -25,10 +25,11 @@ class CoinRepository(ICoinRepository):
     def find_coin_by_id(self, coin_id: int) -> CoinDTO | None:
         try:
             coin = self.db.cur.execute(
-                """SELECT id 
+                """SELECT id
                         FROM coins
                         WHERE id = ?""",
-                (coin_id,)).fetchone()[0]
+                (coin_id,),
+            ).fetchone()[0]
             return coin
         except:
             return None
@@ -36,10 +37,11 @@ class CoinRepository(ICoinRepository):
     def find_coin_by_name(self, name: str) -> CoinDTO | None:
         try:
             coin = self.db.cur.execute(
-                """SELECT id 
+                """SELECT id
                         FROM coins
                         WHERE coin = ?""",
-                (name,)).fetchone()[0]
+                (name,),
+            ).fetchone()[0]
             return coin
         except:
             return None

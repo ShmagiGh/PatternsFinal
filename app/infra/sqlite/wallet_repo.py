@@ -6,17 +6,16 @@ from app.infra.sqlite.database import DB
 
 
 class IWalletRepository(Protocol):
-
     def create_wallet(self, wallet: WalletDTO, coin_id: int, amount: Decimal) -> None:
         pass
 
     def deposit_to_wallet(
-            self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-            self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         pass
 
@@ -58,10 +57,10 @@ class WalletRepository(IWalletRepository):
         # )
 
     def create_wallet(
-            self,
-            wallet: WalletDTO,
-            coin_id: int = 1,
-            amount: Decimal = Decimal("1"),
+        self,
+        wallet: WalletDTO,
+        coin_id: int = 1,
+        amount: Decimal = Decimal("1"),
     ) -> None:
         self.db.cur.execute(
             """INSERT INTO wallets (api_key, address) VALUES(?,?)""",
@@ -74,7 +73,7 @@ class WalletRepository(IWalletRepository):
         self.db.conn.commit()
 
     def deposit_to_wallet(
-            self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         curr_balance = self.check_wallet_balance(wallet, coin_id)
         new_balance = curr_balance + amount
@@ -89,7 +88,7 @@ class WalletRepository(IWalletRepository):
         self.db.conn.commit()
 
     def withdraw_from_wallet(
-            self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal
     ) -> None:
         curr_balance = self.check_wallet_balance(wallet, coin_id)
         new_balance = curr_balance - amount

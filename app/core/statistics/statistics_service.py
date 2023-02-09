@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from typing import Protocol
-
 from decimal import Decimal
+from typing import Protocol
 
 from app.infra.sqlite.statistic_repo import IStatisticRepository
 
