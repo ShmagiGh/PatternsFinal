@@ -20,7 +20,12 @@ transaction_api = APIRouter(prefix="/transactions", tags=["Transactions"])
 def get_user_transactions(
     api_key: str, core: BitcoinWalletCore = Depends(get_core)
 ) -> List[TransactionDTO]:
-    return core.transactionInterface.get_transactions_of_user(api_key)
+    user_transactions = core.transactionInterface.get_transactions_of_user(api_key)
+    if user_transactions is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No such user exists."
+        )
+    return user_transactions
 
 
 @transaction_api.post("")
@@ -34,6 +39,10 @@ def set_transaction(
 ) -> TransactionDTO:
     commission: Decimal = Decimal(0.0)
     user_wallets = core.walletInterface.get_wallets(api_key=api_key)
+    if user_wallets is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No such user exists."
+        )
     user_wallets_addresses = map(lambda wallet: wallet.address, user_wallets)
 
     if from_address not in user_wallets_addresses:

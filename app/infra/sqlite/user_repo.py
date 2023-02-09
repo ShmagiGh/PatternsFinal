@@ -40,5 +40,6 @@ class UserRepository(IUserRepository):
                 (api_key,),
             ).fetchone()[0]
             return user
-        except:
+        except Exception as e:
+            print(e)
             return None

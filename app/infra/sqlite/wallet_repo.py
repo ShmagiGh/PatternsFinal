@@ -116,7 +116,8 @@ class WalletRepository(IWalletRepository):
                 (wallet.address, coin_id),
             ).fetchone()[0]
             return Decimal(str(balance))
-        except:
+        except Exception as e:
+            print(e)
             return None
 
     def check_wallet_count(self, api_key: str) -> int:

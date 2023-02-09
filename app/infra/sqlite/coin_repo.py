@@ -31,7 +31,8 @@ class CoinRepository(ICoinRepository):
                 (coin_id,),
             ).fetchone()[0]
             return coin
-        except:
+        except Exception as e:
+            print(e)
             return None
 
     def find_coin_by_name(self, name: str) -> CoinDTO | None:
@@ -43,5 +44,6 @@ class CoinRepository(ICoinRepository):
                 (name,),
             ).fetchone()[0]
             return coin
-        except:
+        except Exception as e:
+            print(e)
             return None

@@ -15,11 +15,15 @@ class StatisticRepository(IStatisticRepository):
     db: DB
 
     def get_commissions_of_all_transactions(self) -> Decimal:
-        transaction_str = """SELECT SUM(commision)
-                                  FROM transactions;"""
+        try:
+            transaction_str = """SELECT SUM(commision)
+                                      FROM transactions;"""
 
-        profit = self.db.cur.execute(
-            transaction_str,
-        ).fetchone()[0]
+            profit = self.db.cur.execute(
+                transaction_str,
+            ).fetchone()[0]
 
-        return Decimal(profit)
+            return Decimal(profit)
+        except Exception as e:
+            print(e)
+            return None
