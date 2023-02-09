@@ -29,8 +29,8 @@ db.cur.execute(
 wallet_repo = WalletRepository(db)
 wallet_service = WalletService(wallet_repo, RandomAddressGenerator())
 
-coin_btc = CoinDTO("BTC", 1)
-coin_satoshi = CoinDTO("SATOSHI", 2)
+coin_btc = CoinDTO(1, "BTC")
+coin_satoshi = CoinDTO(2, "SATOSHI")
 
 user1 = UserDTO("a2", "a3")
 user2 = UserDTO("b2", "b3")
@@ -53,16 +53,16 @@ def test_create_wallet():
 
 
 def test_deposit_wallet():
-    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("1.4"))
-    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("2.2"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.coin_id) == Decimal(
+    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.id, Decimal("1.4"))
+    wallet_service.deposit_to_wallet(wallets["wallet1"], coin_btc.id, Decimal("2.2"))
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.id) == Decimal(
         "4.6"
     )
 
 
 def test_withdraw_wallet():
-    wallet_service.withdraw_from_wallet(wallets["wallet1"], coin_btc.coin_id, Decimal("0.7"))
-    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.coin_id) == Decimal(
+    wallet_service.withdraw_from_wallet(wallets["wallet1"], coin_btc.id, Decimal("0.7"))
+    assert wallet_service.check_wallet_balance(wallets["wallet1"], coin_btc.id) == Decimal(
         "3.9"
     )
 
