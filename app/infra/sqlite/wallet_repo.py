@@ -10,16 +10,16 @@ class IWalletRepository(Protocol):
         pass
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
         pass
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int, api_key: str) -> Decimal:
         pass
 
     def check_wallet_count(self, api_key: str) -> int:
@@ -73,9 +73,11 @@ class WalletRepository(IWalletRepository):
         self.db.conn.commit()
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
-        curr_balance = self.check_wallet_balance(wallet, coin_id)
+        curr_balance = self.check_wallet_balance(wallet, coin_id, api_key)
+        if curr_balance is None:
+            return
         new_balance = curr_balance + amount
         self.db.cur.execute(
             """UPDATE balances
@@ -88,9 +90,11 @@ class WalletRepository(IWalletRepository):
         self.db.conn.commit()
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
-        curr_balance = self.check_wallet_balance(wallet, coin_id)
+        curr_balance = self.check_wallet_balance(wallet, coin_id, api_key)
+        if curr_balance is None:
+            return
         new_balance = curr_balance - amount
         # print(curr_balance, amount, curr_balance - amount, curr_balance + amount)
         # diff = curr_balance - amount
@@ -105,15 +109,17 @@ class WalletRepository(IWalletRepository):
         )
         self.db.conn.commit()
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int, api_key: str) -> Decimal:
         try:
             balance = self.db.cur.execute(
                 """SELECT b.balance
                      FROM balances b
+                     JOIN wallets w
                      WHERE b.wallet_address = ?
                       AND b.coin_id = ?
+                      AND w.api_key = ?
                    """,
-                (wallet.address, coin_id),
+                (wallet.address, coin_id, api_key),
             ).fetchone()[0]
             return Decimal(str(balance))
         except:

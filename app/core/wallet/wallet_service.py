@@ -30,16 +30,16 @@ class IWallet(Protocol):
         pass
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
         pass
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
         pass
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int, api_key: str) -> Decimal:
         pass
 
     def check_wallet_count(self, api_key: str) -> int:
@@ -69,17 +69,17 @@ class WalletService(IWallet):
         return address
 
     def deposit_to_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
-        self._wallet_repo.deposit_to_wallet(wallet, coin_id, amount)
+        self._wallet_repo.deposit_to_wallet(wallet, coin_id, amount, api_key)
 
     def withdraw_from_wallet(
-        self, wallet: WalletDTO, coin_id: int, amount: Decimal
+        self, wallet: WalletDTO, coin_id: int, amount: Decimal, api_key: str
     ) -> None:
-        self._wallet_repo.withdraw_from_wallet(wallet, coin_id, amount)
+        self._wallet_repo.withdraw_from_wallet(wallet, coin_id, amount, api_key)
 
-    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int) -> Decimal:
-        return self._wallet_repo.check_wallet_balance(wallet, coin_id)
+    def check_wallet_balance(self, wallet: WalletDTO, coin_id: int, api_key: str) -> Decimal:
+        return self._wallet_repo.check_wallet_balance(wallet, coin_id, api_key)
 
     def check_wallet_count(self, api_key: str) -> int:
         return self._wallet_repo.check_wallet_count(api_key)

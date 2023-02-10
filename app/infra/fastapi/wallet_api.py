@@ -33,7 +33,7 @@ def get_wallet(
 ):
     coin = CoinDTO(1, "BTC")
     balance_btc = core.walletInterface.check_wallet_balance(
-        WalletDTO(api_key, address), coin.id
+        WalletDTO(api_key, address), coin.id, api_key
     )
     if balance_btc is None:
         raise HTTPException(

@@ -56,11 +56,11 @@ class TransactionRepository(ITransactionRepository):
         wallet_to = WalletDTO(api_key=api_key, address=transaction.wallet_to_address)
 
         coin_id = transaction.coin_type_id
-        self.wallet_repo.check_wallet_balance(wallet=wallet_to, coin_id=coin_id)
+        self.wallet_repo.check_wallet_balance(wallet=wallet_to, coin_id=coin_id, api_key=api_key)
         withdrawn_amount = (1 + transaction.commission) * transaction.amount
         # ვოლეტი ამის api_key-ს თუ ემთხვევა უნდა გავტესტოთ
         if (
-            self.wallet_repo.check_wallet_balance(wallet=wallet_from, coin_id=coin_id)
+            self.wallet_repo.check_wallet_balance(wallet=wallet_from, coin_id=coin_id, api_key=api_key)
             < withdrawn_amount
         ):
             return None
@@ -81,10 +81,10 @@ class TransactionRepository(ITransactionRepository):
             ),
         )
         self.wallet_repo.deposit_to_wallet(
-            wallet=wallet_to, coin_id=coin_id, amount=transaction.amount
+            wallet=wallet_to, coin_id=coin_id, amount=transaction.amount, api_key=api_key
         )
         self.wallet_repo.withdraw_from_wallet(
-            wallet=wallet_from, coin_id=coin_id, amount=withdrawn_amount
+            wallet=wallet_from, coin_id=coin_id, amount=withdrawn_amount, api_key=api_key
         )
 
         self.db.conn.commit()
